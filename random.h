@@ -24,13 +24,13 @@ double drand() {
 
 
 
-int randi(int n) {
+int irandi(int n) {
 	return (int)(drand()*n);
 }
 
 
 
-int randi2(int s,int e) {
+int irandi2(int s,int e) {
 	return randi(e-s+1)+s;
 }
 
