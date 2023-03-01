@@ -3,9 +3,6 @@
 #define TEXTTWIST_IMPLEMENTATION
 #include "texttwist.h"
 
-#define DICT_FILE "wordeng0.txt"
-#define RAND_FILE "randeng.txt"
-
 
 
 int main(void) {
@@ -20,18 +17,28 @@ int main(void) {
 	size_t na=0;
 
 	TextTwist_LoadDict(&d,&nd,"wordlist.txt",3,8);
-	TextTwist_LoadDict(&r,&nr,DICT_FILE,6,8);
+	TextTwist_LoadDict(&r,&nr,"wordeng.txt",6,8);
 
-	FILE *fout=fopen(RAND_FILE,"w");
+	FILE *fout=fopen("wordeng0.txt","w");
 
 	for(size_t i=0;i<nr;i++) {
-		TextTwist_GetAnagrams(&a,&na,d,nd,r[i]);
-		if(na>=10 && na<=30) {
-			fprintf(fout,"%s\n",r[i]);
-			fflush(fout);
-			printf("%s\n",r[i]);
+		size_t l=strlen(r[i]);
+		if(l>=6 && l<=8) {
+
+			bool found=false;
+			for(size_t j=0;j<nd;j++) {
+				if(!strcasecmp(r[i],d[j])) {
+					found=true;
+					break;
+				}
+			}
+
+			if(found) {
+				fprintf(fout,"%s\n",r[i]);
+				fflush(fout);
+				printf("%s\n",r[i]);
+			}
 		}
-		TextTwist_FreeWords(&a,&na);
 	}
 	fclose(fout);
 

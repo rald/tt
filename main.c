@@ -36,7 +36,7 @@
 
 
 #define WORD_FILE "wordlist.txt"
-#define RAND_FILE "randlist.txt"
+#define RAND_FILE "randeng.txt"
 #define SCORE_FILE "score.txt"
 
 
@@ -232,11 +232,11 @@ void parsein(IrcMsg *im) {
 
 			w=strdup(r[rand()%nr]);
 			l=strlen(w);
-			s=strdup(r[rand()%nr]);
 			t=TextTwist_ShuffleWord(strdup(w));		
 			TextTwist_GetAnagrams(&a,&na,d,nd,w);
 			TextTwist_ShuffleAnagrams(&a,na);
 			TextTwist_SortAnagrams(&a,na);
+			s=strdup(a[rand()%na]);
 
 			g=malloc(sizeof(*g)*na);
 			for(size_t i=0;i<na;i++) {
@@ -245,7 +245,11 @@ void parsein(IrcMsg *im) {
 			ng=0;
 			
 			gameState=GAMESTATE_START;
+
+			printf("%s\n\n",w);
+			printf("%s?\n\n",s);
 			TextTwist_PrintWords(a,na);
+			
 			privmsg(sck,chn,GAME_TITLE" %s",t);
 
 			alarm(1);
