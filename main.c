@@ -480,7 +480,7 @@ int main(void) {
 			
 			if(!strcmp(im.cmd,"PING")) {
 				line[1]='O';
-				raw(sck,"PONG %s\r\n",im.txt);
+				raw(sck,"PONG :%s\r\n",im.txt);
 			} else if(!strcmp(im.cmd,"001")) {
 				raw(sck,"JOIN %s\r\n",chn);
 			} else if(!strcmp(im.cmd,"PRIVMSG")) {
