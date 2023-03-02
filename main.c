@@ -317,7 +317,7 @@ void parsein(IrcMsg *im) {
 				sprintf(str," %zu",players[i]->score);
 				strcat(msg,str);
 			}
-			privmsg(sck,im->usr,GAME_TITLE" top10: %s",msg);
+			privmsg(sck,chn,GAME_TITLE" top10: %s",msg);
 	} else {
 
 		size_t points=0; 
