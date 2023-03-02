@@ -317,7 +317,7 @@ void parsein(IrcMsg *im) {
 				sprintf(str," %zu",players[i]->score);
 				strcat(msg,str);
 			}
-			notice(sck,im->usr,GAME_TITLE" %s: top10: %s",im->usr,msg);
+			privmsg(sck,im->usr,GAME_TITLE" top10: %s",msg);
 	} else {
 
 		size_t points=0; 
@@ -333,7 +333,7 @@ void parsein(IrcMsg *im) {
 		if(j!=-1) {
 
 			if(g[j]) {
-				notice(sck,im->usr,GAME_TITLE" %s: %s is already guessed",im->usr,a[j]);
+				notice(sck,im->usr,GAME_TITLE" %s: '%s' is already guessed",im->usr,a[j]);
 			} else {
 
 				g[j]=true;
@@ -360,7 +360,7 @@ void parsein(IrcMsg *im) {
 					strcat(msg," (completed the game bonus) ");
 				}
 			
-				notice(sck,im->usr,GAME_TITLE" %s: plus %zu points %s",im->usr,points,msg);
+				notice(sck,im->usr,GAME_TITLE" %s: guessed '%s' plus %zu points %s",im->usr,a[j],points,msg);
 
 				ssize_t k=Player_Find(players,nplayers,im->usr);
 
