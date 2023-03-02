@@ -304,7 +304,7 @@ void parsein(IrcMsg *im) {
 			}
 		} 
 	
-	} else if(!strcmp(msg,".top")) {
+	} else if(!strcmp(msg,".top") && nplayers) {
 			qsort(players,nplayers,sizeof(*players),cmpByScoreDesc);
 			char msg[STRING_MAX];
 			char str[STRING_MAX];
