@@ -1,4 +1,7 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
 
 
 #define CARD_IMPLEMENTATION 
@@ -7,21 +10,50 @@
 #define DECK_IMPLEMENTATION 
 #include "deck.h"
 
+
+
 int *deck=NULL;
 int ndeck=0;
 
+int *hands[3];
+int nhands[3];
+
+int nplayers=3;
+
+
+
 int main() {
+
+	srand(time(NULL));
 
 
 
 	Deck_New(&deck,&ndeck);
 
-	for(int i=0;i<ndeck;i++) {
-		char *str=Card_ToString(deck[i]);
-		printf("%s %2d %d %2d\n",str,Card_GetRank(deck[i]),Card_GetSuit(deck[i]),Card_Value(str));
-		free(str);
-		str=NULL;
-	} 
+	Cards_Shuffle(&deck,ndeck);
+
+	for(int j=0;j<nplayers;j++) {
+		hands[j]=NULL;
+		nhands[j]=0;
+		for(int i=0;i<(j==0?13:12);i++) {
+			int card=Cards_PopFront(&deck,&ndeck);
+			if(card==-1) break;
+			Cards_PushBack(&hands[j],&nhands[j],card);
+		}
+		Cards_Print(hands[j],nhands[j]);
+	}
+
+	
+
+	for(int i=0;i<nplayers;i++) {
+ 		Cards_Free(&hands[i],&nhands[i]);
+	}
+	
+	Cards_Free(&deck,&ndeck);
+
+
 
 	return 0;
 }
+
+

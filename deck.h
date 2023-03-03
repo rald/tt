@@ -9,8 +9,12 @@
 
 
 void Deck_New(int **deck,int *ndeck);
-
-void Deck_Shuffle(int *deck,int ndeck);
+void Deck_Shuffle(int **deck,int ndeck);
+void Deck_PushFront(int **deck,int *ndeck,int card);
+void Deck_PushBack(int **deck,int *ndeck,int card);
+int Deck_PopFront(int **deck,int *ndeck);
+int Deck_PopBack(int **deck,int *ndeck);
+void Deck_Free(int **deck,int *ndeck);
 
 
 
@@ -20,31 +24,14 @@ void Deck_Shuffle(int *deck,int ndeck);
 
 void Deck_New(int **deck,int *ndeck) {
 	*ndeck=52;
-	*deck=malloc(sizeof(**deck)**ndeck);
+	*deck=malloc(sizeof(**deck)*(*ndeck));
 	for(int i=0;i<*ndeck;i++) {
 		(*deck)[i]=i;
 	}
 }
 
-void Deck_Print(int *deck,int ndeck) {
-	for(int i=0;i<ndeck;i++) {
-		if(i!=0) printf(", ");
-		char *str=Card_ToString(deck[i]);
-		printf("%s",str);
-		free(str);
-		str=NULL;
-	}
-	printf("\n");
-}
 
-void Deck_Shuffle(int *deck,int ndeck) {
-	for(int i=ndeck-1;i>0;i++)	{
-		int j=rand()%(i+1);
-		int tmp=deck[i];
-		deck[i]=deck[j];
-		deck[j]=tmp;
-	}
-}
+
 
 
 
@@ -53,6 +40,5 @@ void Deck_Shuffle(int *deck,int ndeck) {
 
 
 #endif /* DECK_H */
-
 
 
