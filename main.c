@@ -31,20 +31,12 @@
 #define STRUTIL_IMPLEMENTATION 
 #include "strutil.h"
 
-#define TEXTTWIST_IMPLEMENTATION 
-#include "texttwist.h"
-
-
-#define WORD_FILE "wordlist.txt"
-#define RAND_FILE "randeng.txt"
-#define SCORE_FILE "score.txt"
-
 
 
 const char *mst = "siesta";
-const char *hst = "irc.dal.net";
+const char *hst = "irc.undernet.org";
 const char *prt = "6667";
-const char *nck = "mia";
+const char *nck = "siestu";
 const char *chn = "#pantasya";
 const char *pss = NULL;
 
@@ -74,75 +66,16 @@ struct Player {
 };
 
 
-char **d=NULL;
-size_t nd=0;
-
-char **r=NULL;
-size_t nr=0;
-
-char **a=NULL;
-size_t na=0;
-
-bool *g=NULL;
-size_t ng=0;
-
-char *w=NULL;
-char *s=NULL;
-char *t=NULL;
-
-size_t l=0;
 
 Player **players=NULL;
 size_t nplayers=0;
 
 GameState gameState=GAMESTATE_INIT;
 
-size_t allottedTime=180;
-size_t elapsedTime=0;
-
-char *ListAnagrams(char **a,size_t na,bool *g,char *s,bool show) {
-	char *msg=malloc(sizeof(*msg)*STRING_MAX);
-	msg[0]='\0';
-
-	for(size_t i=0;i<na;i++) {
-		if(i!=0) strcat(msg,", ");
-
-		if(g[i]) {
-			strcat(msg,a[i]);
-			if(show) strcat(msg,"+");
-		} else {
-			if(show) strcat(msg,a[i]); else for(size_t j=0;j<strlen(a[i]);j++) strcat(msg,"*");
-			if(show) strcat(msg,"-");
-		}
-
-		if(show && !strcasecmp(s,a[i])) {
-			strcat(msg,"?");
-		}
-	}
-
-	return msg;
-}
-
 
 
 void sig_handler(int signum) {
 	if(signum==SIGALRM) {
-		if(elapsedTime>=allottedTime) {
-
-			privmsg(sck,chn,GAME_TITLE" time up!");
-
-			char *msg=ListAnagrams(a,na,g,s,true);
-
-			privmsg(sck,chn,GAME_TITLE" %s",msg);
-
-			free(msg);
-			msg=NULL;
-
-			gameState=GAMESTATE_INIT;
-		} else {
-			elapsedTime++;
-			alarm(1);
-		}
 	}
 }
 
@@ -213,6 +146,8 @@ int cmpByScoreDesc(const void *l,const void *r) {
 	return 0;
 }
 
+
+
 void parsein(IrcMsg *im) {
 
 	char *msg=strdup(im->txt);
@@ -222,62 +157,13 @@ void parsein(IrcMsg *im) {
 	if(!strcmp(msg,".start")) {
 
 		if(gameState==GAMESTATE_INIT) {
-
-			if(a) TextTwist_FreeWords(&a,&na);
-			if(t) { free(t); t=NULL; }
-			if(s) { free(s); s=NULL; }
-			if(w) { free(w); w=NULL; }
-
-			elapsedTime=0;
-
-			w=strdup(r[rand()%nr]);
-			l=strlen(w);
-			t=TextTwist_ShuffleWord(strdup(w));		
-			TextTwist_GetAnagrams(&a,&na,d,nd,w);
-			TextTwist_ShuffleAnagrams(&a,na);
-			TextTwist_SortAnagrams(&a,na);
-			s=strdup(a[rand()%na]);
-
-			g=malloc(sizeof(*g)*na);
-			for(size_t i=0;i<na;i++) {
-				g[i]=false;
-			}
-			ng=0;
 			
 			gameState=GAMESTATE_START;
-
-			printf("%s\n\n",w);
-			printf("%s?\n\n",s);
-			TextTwist_PrintWords(a,na);
-			
-			privmsg(sck,chn,GAME_TITLE" %s",t);
 
 			alarm(1);
 			
 		} else if(gameState==GAMESTATE_START) {
 			notice(sck,im->usr,GAME_TITLE" %s: game is already started",im->usr);
-		}
-	} else if(!strcmp(msg,".twist")) {
-		if(gameState==GAMESTATE_START) {
-			t=TextTwist_ShuffleWord(t);		
-			privmsg(sck,chn,GAME_TITLE" %s",t);
-		} else {
-			notice(sck,im->usr,GAME_TITLE" %s: game is not started",im->usr);
-		}
-	} else if(!strcmp(msg,".time")) {
-		if(gameState==GAMESTATE_START) {
-			notice(sck,im->usr,GAME_TITLE" %s: time left %zu",im->usr,allottedTime-elapsedTime);
-		} else {
-			notice(sck,im->usr,GAME_TITLE" %s: game is not started",im->usr);
-		}
-	} else if(!strcmp(msg,".list")) {
-		if(gameState==GAMESTATE_START) {
-			char *msg=ListAnagrams(a,na,g,s,false);
-			notice(sck,im->usr,GAME_TITLE" %s: %s",im->usr,msg);
-			free(msg);
-			msg=NULL;
-		} else {
-			notice(sck,im->usr,GAME_TITLE" %s: game is not started",im->usr);
 		}
 	} else if(!strncmp(msg,".score",6)) {
 
@@ -305,81 +191,19 @@ void parsein(IrcMsg *im) {
 		} 
 	
 	} else if(!strcmp(msg,".top") && nplayers) {
-			qsort(players,nplayers,sizeof(*players),cmpByScoreDesc);
-			char msg[STRING_MAX];
-			char str[STRING_MAX];
-			msg[0]='\0';
-			for(size_t i=0;i<(nplayers>10?10:nplayers);i++) {
-				if(i!=0) strcat(msg,", ");
-				sprintf(str,"(%zu) ",i+1);
-				strcat(msg,str);
-				strcat(msg,players[i]->nick);
-				sprintf(str," %zu",players[i]->score);
-				strcat(msg,str);
-			}
-			privmsg(sck,chn,GAME_TITLE" top10: %s",msg);
-	} else {
-
-		size_t points=0; 
-	
-		ssize_t j=-1;
-		for(size_t i=0;i<na;i++) {
-			if(!strcasecmp(trim(im->txt),a[i])) {
-				j=i;
-				break;
-			}
+		qsort(players,nplayers,sizeof(*players),cmpByScoreDesc);
+		char msg[STRING_MAX];
+		char str[STRING_MAX];
+		msg[0]='\0';
+		for(size_t i=0;i<(nplayers>10?10:nplayers);i++) {
+			if(i!=0) strcat(msg,", ");
+			sprintf(str,"(%zu) ",i+1);
+			strcat(msg,str);
+			strcat(msg,players[i]->nick);
+			sprintf(str," %zu",players[i]->score);
+			strcat(msg,str);
 		}
-
-		if(j!=-1) {
-
-			if(g[j]) {
-				notice(sck,im->usr,GAME_TITLE" %s: '%s' is already guessed",im->usr,a[j]);
-			} else {
-
-				g[j]=true;
-				ng++;
-
-				points+=strlen(a[j]);
-
-				char msg[STRING_MAX];
-
-				msg[0]='\0';
-
-				if(strlen(a[j])==l) {
-					points+=100;
-					strcat(msg," (long word bonus) ");
-				}
-
-				if(!strcmp(a[j],s)) {
-					points+=100;
-					strcat(msg," (secret word bonus) ");
-				}
-
-				if(ng==na) { 
-					points+=100;
-					strcat(msg," (completed the game bonus) ");
-				}
-			
-				notice(sck,im->usr,GAME_TITLE" %s: guessed '%s' plus %zu points %s",im->usr,a[j],points,msg);
-
-				ssize_t k=Player_Find(players,nplayers,im->usr);
-
-				if(k==-1) {
-					Player_Add(&players,&nplayers,Player_New(im->usr,points));
-				} else {
-					players[k]->score+=points;
-				}
-
-				Players_Save(players,nplayers,SCORE_FILE);
-				if(ng==na) {
-					privmsg(sck,chn,GAME_TITLE" game completed by %s",im->usr);
-					alarm(0);
-					gameState=GAMESTATE_INIT;
-				}
-
-			}
-
-		}
+		privmsg(sck,chn,GAME_TITLE" top10: %s",msg);
 	}
 	
 	free(msg);
@@ -418,11 +242,6 @@ int main(void) {
 	srand(time(NULL));
 	
 	signal(SIGALRM, sig_handler);
-
-	TextTwist_LoadDict(&d,&nd,WORD_FILE,3,8);
-	TextTwist_LoadDict(&r,&nr,RAND_FILE,6,8);
-
-	Players_Load(&players,&nplayers,SCORE_FILE);
 
   ini_t *config = ini_load("config.ini");
 
