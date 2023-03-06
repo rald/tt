@@ -1,0 +1,11 @@
+pick
+dump
+drop
+lay
+secret
+
+fight
+challenge
+fold
+burn
+

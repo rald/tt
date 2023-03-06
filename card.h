@@ -2,6 +2,9 @@
 #define CARD_H
 
 #include <stdlib.h>
+#include <ctype.h>
+
+
 
 int Card_GetRank(int card);
 int Card_GetSuit(int card);
@@ -13,6 +16,9 @@ void Cards_PushFront(int **cards,int *ncards,int card);
 void Cards_PushBack(int **cards,int *ncards,int card);
 int Cards_PopFront(int **cards,int *ncards);
 int Cards_PopBack(int **cards,int *ncards);
+int cmpSortRankSuit(const void *a,const void *b);
+int cmpSortValue(const void *a,const void *b);
+void Cards_AutoMeld(int **cards,size_t ncards);
 void Cards_Free(int **cards,int *ncards);
 
 
@@ -146,6 +152,49 @@ int Cards_PopBack(int **cards,int *ncards) {
 		}
 	}
 	return res;
+}
+
+
+
+int cmpSortRankSuit(const void *a,const void *b) {
+	int l=*(int*)a;
+	int r=*(int*)b;
+	if(Card_GetRank(l)<Card_GetRank(r)) return -1;
+	if(Card_GetRank(l)>Card_GetRank(r)) return 1;
+	if(Card_GetSuit(l)<Card_GetSuit(r)) return -1;
+	if(Card_GetSuit(l)>Card_GetSuit(r)) return 1;
+	return 0;
+}
+
+
+
+int cmpSortValue(const void *a,const void *b) {
+	int l=*(int*)a;
+	int r=*(int*)b;
+	if(l<r) return -1;
+	if(l>r) return 1;
+	return 0;
+}
+
+
+
+void Cards_AutoMeld(int **cards,size_t ncards) {
+
+	qsort(*cards,ncards,sizeof(**cards),cmpSortRankSuit);
+
+	size_t k=0,l=0,m=0;
+	int r=Card_GetRank((*cards)[0]);
+	while(k<ncards) {
+		if(Card_GetRank((*cards)[k])==r) {
+			k++; m++;
+		} else if(m>=3) {
+			l=k;
+			m=0;
+			r=Card_GetRank((*cards)[k]);
+		} else break;
+	}
+
+	qsort((*cards)+l,ncards-l,sizeof(**cards),cmpSortValue);
 }
 
 

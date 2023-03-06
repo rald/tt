@@ -6,11 +6,10 @@
 #include <stdlib.h>
 
 
+
 double drand();
-
-int rndi(int n);
-
-int randi2(int s,int e);
+int irndi(int n);
+int irandi2(int s,int e);
 
 
 
@@ -37,6 +36,7 @@ int irandi2(int s,int e) {
 
 
 #endif
+
 
 
 #endif
